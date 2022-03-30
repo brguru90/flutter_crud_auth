@@ -1,0 +1,21 @@
+{
+  "name": "flutter_crud_auth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/brguru90/flutter_crud_auth",
+  "author": "Guruprasad BR <brguru90@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^7.0.0",
+    "npm-run-all": "^4.1.5"
+  },
+  "scripts": {
+    "install_frontend": "yarn --cwd ./flutter_frontend install",
+    "install_backend": "yarn --cwd ./backend install",
+    "install": "npm-run-all --serial --continue-on-error install_frontend install_backend",
+    "start_frontend_dev":"yarn --cwd ./flutter_frontend start",
+    "start_backend_dev":"yarn --cwd ./backend start",
+    "start":"concurrently 'yarn --cwd ./flutter_frontend start' 'yarn --cwd ./backend start' "
+  }
+}

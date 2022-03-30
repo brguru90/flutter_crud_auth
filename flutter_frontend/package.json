@@ -1,0 +1,12 @@
+{
+  "name": "flutter_frontend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "install": "flutter packages get",
+    "start": "flutter run"
+  }
+}
+
+
