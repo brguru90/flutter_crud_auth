@@ -55,3 +55,4 @@ flutter_frontend/android/app/profile
 flutter_frontend/android/app/release
 flutter_frontend/yarn-error.log
 flutter_frontend/yarn.lock
+flutter_frontend/node_modules
