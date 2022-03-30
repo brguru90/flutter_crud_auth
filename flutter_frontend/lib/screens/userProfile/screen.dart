@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class UserProfile extends StatefulWidget {
-  const UserProfile({ Key? key }) : super(key: key);
+  final Map<String, String> env_values;
+  const UserProfile({ Key? key,Map<String, String> this.env_values=const {} }) : super(key: key);
 
   @override
   State<UserProfile> createState() => _UserProfileState();

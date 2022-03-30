@@ -1,7 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_crud_auth/services/http_request.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final Map<String, String> env_values;
+
+  const LoginScreen({Key? key, Map<String, String> this.env_values = const {}})
+      : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -10,13 +17,29 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController emailController =
+      new TextEditingController(text: "");
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    // emailController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Login"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Login"),
+            Text("""APP_ENV=${widget.env_values["APP_ENV"]}""")
+          ],
+        ),
         automaticallyImplyLeading: false,
-        centerTitle: true,
+        // centerTitle: true,
       ),
       body: Container(
         color: Colors.grey[200],
@@ -29,8 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
+                controller: emailController,
                 cursorColor: Theme.of(context).cursorColor,
-                initialValue: '',
                 maxLength: 20,
                 decoration: const InputDecoration(
                   icon: Icon(Icons.email),
@@ -55,14 +78,18 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    print("ok");
-                  } 
-                  else {
+                    await exeFetch(
+                      uri: "/api/login/",
+                      method: "post",
+                      body: jsonEncode({
+                        "email": emailController.text,
+                      }),
+                    );
+                  } else {
                     print("not ok");
                   }
-
                 },
                 child: Wrap(children: const [
                   Icon(Icons.login),

@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:flutter_crud_auth/screens/login/screen.dart';
 import 'package:flutter_crud_auth/screens/signUp/screen.dart';
 import 'package:flutter_crud_auth/screens/userProfile/screen.dart';
 
+Future<void> loadENV() {
+  if (String.fromEnvironment("RELEASE_MODE") == "true") {
+    return dotenv.load(fileName: "assets/env/.env_prod");
+  } else {
+    return dotenv.load(fileName: "assets/env/.env");
+  }
+}
 
-void main(){
+void main() async {
+  await loadENV();
+  Map<String, String>  env_values=dotenv.env;
   runApp(MaterialApp(
     initialRoute: "/",
     routes: {
-      "/":(context) => LoginScreen(),
-      "/sign_up":(context) => SignUP(),
-      "/user_profile":(context) => UserProfile(),
+      "/": (context) => LoginScreen(env_values:env_values),
+      "/sign_up": (context) => SignUP(env_values:env_values),
+      "/user_profile": (context) => UserProfile(env_values:env_values),
     },
   ));
 }
+
