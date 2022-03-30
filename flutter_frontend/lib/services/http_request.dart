@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'package:flutter_crud_auth/services/secure_store.dart';
+
 // Future<Map<dynamic, dynamic>> exeFetch(
 //     {required String uri,
 //     method = "get",
@@ -54,7 +56,7 @@ Future<Map<dynamic, dynamic>> exeFetch(
     {required String uri,
     method = "get",
     body = const {},
-     Map<String,dynamic> header = const {
+    Map<String, dynamic> header = const {
       "Content-Type": "application/json",
     }}) async {
   if (uri.startsWith("/")) {
@@ -65,33 +67,52 @@ Future<Map<dynamic, dynamic>> exeFetch(
   var client = HttpClient();
   late HttpClientRequest request;
 
+  String csrf_token = await storage.read(key: "csrf_token") ?? "";
+
+  print("csrf_token = $csrf_token");
+
   try {
     switch (method) {
       case "post":
-        request = await client.post(dotenv.env["SERVER_HOST"].toString(), int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
+        request = await client.post(dotenv.env["SERVER_HOST"].toString(),
+            int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
         break;
       case "put":
-        request = await client.put(dotenv.env["SERVER_HOST"].toString(), int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
+        request = await client.put(dotenv.env["SERVER_HOST"].toString(),
+            int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
         break;
       case "delete":
-        request = await client.delete(dotenv.env["SERVER_HOST"].toString(), int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
+        request = await client.delete(dotenv.env["SERVER_HOST"].toString(),
+            int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
         break;
       default:
-        request = await client.get(dotenv.env["SERVER_HOST"].toString(), int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
+        request = await client.get(dotenv.env["SERVER_HOST"].toString(),
+            int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
     }
-
-    header.forEach((key, value) {      
+    header.forEach((key, value) {
       request.headers.add(key, value);
-    });        
+    });
+    if (csrf_token != "") {
+      request.headers.add("csrf_token", csrf_token);
+    }
     request.write(body);
-
+    print("request.headers ${request.headers}");
     HttpClientResponse response = await request.close();
 
+    if (response.headers.value("csrf_token") != null) {
+      csrf_token = response.headers.value("csrf_token").toString();
+      print("new csrf_token = $csrf_token");
+      await storage.write(key: "csrf_token", value: csrf_token);
+    }
+
+    response.cookies.forEach((cookie) async {
+      await storage.write(key: cookie.name, value: cookie.value);
+    });
 
     print('Response status: ${response.statusCode}');
-    print(response.headers);
+    print("response.headers ${response.headers}");
     print(response.cookies.map((e) => e).length);
-    final stringData=await response.transform(utf8.decoder).join();
+    final stringData = await response.transform(utf8.decoder).join();
     print('Response body2: $stringData');
     // var _cookie=Cookie.fromSetCookieValue(response.headers["set-cookie"].toString());
     // print(_cookie);

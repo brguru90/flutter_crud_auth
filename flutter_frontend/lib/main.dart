@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'package:flutter_crud_auth/services/secure_store.dart';
+
 import 'package:flutter_crud_auth/screens/login/screen.dart';
 import 'package:flutter_crud_auth/screens/signUp/screen.dart';
 import 'package:flutter_crud_auth/screens/userProfile/screen.dart';
@@ -17,14 +19,14 @@ Future<void> loadENV() {
 
 void main() async {
   await loadENV();
-  Map<String, String>  env_values=dotenv.env;
+  initSecureStore();
+  Map<String, String> env_values = dotenv.env;
   runApp(MaterialApp(
     initialRoute: "/",
     routes: {
-      "/": (context) => LoginScreen(env_values:env_values),
-      "/sign_up": (context) => SignUP(env_values:env_values),
-      "/user_profile": (context) => UserProfile(env_values:env_values),
+      "/": (context) => LoginScreen(env_values: env_values),
+      "/sign_up": (context) => SignUP(env_values: env_values),
+      "/user_profile": (context) => UserProfile(env_values: env_values),
     },
   ));
 }
-

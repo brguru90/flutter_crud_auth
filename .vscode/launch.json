@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "compounds": [
     {
-      "name": "debug_project",
+      "name": "debug_both",
       "configurations": ["backend", "flutter_frontend"],
       "presentation": {
           "hidden": false,

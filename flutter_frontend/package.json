@@ -4,9 +4,13 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "install": "flutter packages get",
+    "clean": "flutter clean ",
+    "get": "flutter packages get",
+    "upgrade": "flutter packages upgrade",
+    "install":"npm-run-all --serial --continue-on-error clean get",
     "start": "flutter run"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
   }
 }
-
-
