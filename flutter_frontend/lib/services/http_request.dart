@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -37,6 +38,10 @@ Future<Map<dynamic, dynamic>> exeFetch(
 
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
+    print(response.headers);
+    // var _cookie=Cookie.fromSetCookieValue(response.headers["set-cookie"].toString());
+    // print(_cookie);
+    // print(_cookie.name);
 
     return jsonDecode(response.body);
   } catch (e) {
