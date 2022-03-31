@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_crud_auth/services/http_request.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -23,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    // emailController.dispose();
+    emailController.dispose();
     super.dispose();
   }
 
@@ -99,6 +98,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   Text("Login")
                 ]),
+              ),
+              SizedBox(height: 40.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("New user?"),
+                  TextButton( 
+                    onPressed: (){}, 
+                    child: Text("Click here to sign up")                    
+                  )
+                ],
               )
             ],
           ),
