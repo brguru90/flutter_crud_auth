@@ -3,5 +3,6 @@
   "editor.rulers": [],
   "[dart]": {
     "editor.rulers": []
-  }
+  },
+  "dart.embedDevTools": false
 }

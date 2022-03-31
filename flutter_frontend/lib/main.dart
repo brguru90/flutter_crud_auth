@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:flutter_crud_auth/services/secure_store.dart';
+import 'package:flutter_crud_auth/services/temp_store.dart';
 
 import 'package:flutter_crud_auth/screens/login/screen.dart';
 import 'package:flutter_crud_auth/screens/signUp/screen.dart';
@@ -20,6 +21,7 @@ Future<void> loadENV() {
 void main() async {
   await loadENV();
   initSecureStore();
+  temp_store_reset();
   Map<String, String> env_values = dotenv.env;
   runApp(MaterialApp(
     initialRoute: "/",

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:flutter_crud_auth/services/secure_store.dart';
+import 'package:flutter_crud_auth/services/temp_store.dart';
 
 // Future<Map<dynamic, dynamic>> exeFetch(
 //     {required String uri,
@@ -62,14 +63,9 @@ Future<Map<dynamic, dynamic>> exeFetch(
   if (uri.startsWith("/")) {
     uri = uri.substring(1);
   }
-  // uri =
-  //     """${dotenv.env["SERVER_PROTOCOL"]}://${dotenv.env["SERVER_HOST"]}:${dotenv.env["SERVER_PORT"]}/$uri""";
   var client = HttpClient();
   late HttpClientRequest request;
 
-  String csrf_token = await storage.read(key: "csrf_token") ?? "";
-
-  print("csrf_token = $csrf_token");
 
   try {
     switch (method) {
@@ -89,38 +85,52 @@ Future<Map<dynamic, dynamic>> exeFetch(
         request = await client.get(dotenv.env["SERVER_HOST"].toString(),
             int.parse(dotenv.env["SERVER_PORT"].toString()), uri);
     }
+    // ------------ constructing request --------------------
+
     header.forEach((key, value) {
       request.headers.add(key, value);
     });
-    if (csrf_token != "") {
-      request.headers.add("csrf_token", csrf_token);
+
+    String cookies =
+        temp_store["cookies"] ?? await storage.read(key: "cookies") ?? "";
+    if (cookies != "") {
+      temp_store["cookies"] = cookies;
+      List cookies_obj = jsonDecode(cookies);
+      cookies_obj.forEach((cookie) {
+        request.cookies.add(Cookie.fromSetCookieValue(cookie));
+      });
     }
+
+    if (temp_store["csrf_token"] != null) {
+      request.headers.add("csrf_token", temp_store["csrf_token"]);
+    }
+
     request.write(body);
+
     print("request.headers ${request.headers}");
     HttpClientResponse response = await request.close();
 
+    // ------------ reading response --------------------
+
     if (response.headers.value("csrf_token") != null) {
-      csrf_token = response.headers.value("csrf_token").toString();
-      print("new csrf_token = $csrf_token");
-      await storage.write(key: "csrf_token", value: csrf_token);
+          temp_store["csrf_token"]=response.headers.value("csrf_token").toString();
     }
 
-    response.cookies.forEach((cookie) async {
-      await storage.write(key: cookie.name, value: cookie.value);
-    });
+    if (response.cookies.length > 0) {
+      String _cookies = jsonEncode(
+          response.cookies.map((cookie) => cookie.toString()).toList());
+      await storage.write(key: "cookies", value: _cookies);
+      temp_store["cookies"] = _cookies;
+    }
 
-    print('Response status: ${response.statusCode}');
-    print("response.headers ${response.headers}");
-    print(response.cookies.map((e) => e).length);
     final stringData = await response.transform(utf8.decoder).join();
-    print('Response body2: $stringData');
-    // var _cookie=Cookie.fromSetCookieValue(response.headers["set-cookie"].toString());
-    // print(_cookie);
-    // print(_cookie.name);
+    print('uri=$uri => Response status: ${response.statusCode}\nResponse body2: $stringData');
 
     return jsonDecode(stringData);
-  } catch (e) {
+
+  } catch (e, stacktrace) {
     print(e);
+    print(stacktrace);
     return {};
   } finally {
     client.close();
