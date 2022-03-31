@@ -26,6 +26,20 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void Login() async {
+    if (_formKey.currentState!.validate()) {
+      await exeFetch(
+        uri: "/api/login/",
+        method: "post",
+        body: jsonEncode({
+          "email": emailController.text,
+        }),
+      );
+    } else {
+      print("not ok");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: emailController,
                 cursorColor: Theme.of(context).cursorColor,
-                maxLength: 20,
+                maxLength: 50,
                 decoration: const InputDecoration(
                   icon: Icon(Icons.email),
                   labelText: 'Enter Email Address',
@@ -77,38 +91,49 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () async {
-
-                  if (_formKey.currentState!.validate()) {
-                    await exeFetch(
-                      uri: "/api/login/",
-                      method: "post",
-                      body: jsonEncode({
-                        "email": emailController.text,
-                      }),
-                    );
-                  } else {
-                    print("not ok");
-                  }
-                },
-                child: Wrap(children: const [
-                  Icon(Icons.login),
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  Text("Login")
-                ]),
+                onPressed: Login,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.login),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      Text("Login")
+                    ]),
               ),
               SizedBox(height: 40.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("New user?"),
-                  TextButton( 
-                    onPressed: (){}, 
-                    child: Text("Click here to sign up")                    
-                  )
-                ],
+              Container(
+                // color: Colors.green[100],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text("New user?"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 20,
+                          child: TextButton(
+                              style: TextButton.styleFrom(
+                                // fixedSize: Size.fromHeight(1),
+                                minimumSize: Size(0, 1),
+                                padding: EdgeInsets.zero,
+                              ),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/sign_up'),
+                              child: Text(
+                                "Click here",
+                                // style: TextStyle(height: 0.1),
+                              )),
+                        ),
+                        Text(" to sign up"),
+                      ],
+                    )
+                  ],
+                ),
               )
             ],
           ),
