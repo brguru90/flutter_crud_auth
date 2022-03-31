@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_crud_auth/services/http_request.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatefulWidget {
   final Map<String, String> env_values;
@@ -26,15 +27,39 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    checkExistingSession();
+  }
+
+  void checkExistingSession() {
+    exeFetch(
+      uri: "/api/login_status/",
+    )
+    .then((value) =>Navigator.pushReplacementNamed( context, "/user_profile"));
+  }
+
   void Login() async {
     if (_formKey.currentState!.validate()) {
-      await exeFetch(
+      exeFetch(
         uri: "/api/login/",
         method: "post",
         body: jsonEncode({
           "email": emailController.text,
         }),
-      );
+      )
+          .then((value) =>
+              // Navigator.pushReplacementNamed(context, "/user_profile"))
+               Navigator.pushNamed(context, "/user_profile"))
+          .catchError((e) => Fluttertoast.showToast(
+              msg: e.toString(),
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0));
     } else {
       print("not ok");
     }

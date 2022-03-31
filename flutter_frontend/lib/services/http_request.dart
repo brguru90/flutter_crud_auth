@@ -56,16 +56,20 @@ import 'package:flutter_crud_auth/services/temp_store.dart';
 Future<Map<dynamic, dynamic>> exeFetch(
     {required String uri,
     method = "get",
-    body = const {},
+    body = null,
     Map<String, dynamic> header = const {
       "Content-Type": "application/json",
-    }}) async {
+    },
+    navigateTo = null}) async {
+  if (navigateTo == null) {
+    navigateTo = () {};
+  }
+
   if (uri.startsWith("/")) {
     uri = uri.substring(1);
   }
   var client = HttpClient();
   late HttpClientRequest request;
-
 
   try {
     switch (method) {
@@ -105,7 +109,9 @@ Future<Map<dynamic, dynamic>> exeFetch(
       request.headers.add("csrf_token", temp_store["csrf_token"]);
     }
 
-    request.write(body);
+    if (body != null) {
+      request.write(body);
+    }
 
     print("request.headers ${request.headers}");
     HttpClientResponse response = await request.close();
@@ -113,7 +119,8 @@ Future<Map<dynamic, dynamic>> exeFetch(
     // ------------ reading response --------------------
 
     if (response.headers.value("csrf_token") != null) {
-          temp_store["csrf_token"]=response.headers.value("csrf_token").toString();
+      temp_store["csrf_token"] =
+          response.headers.value("csrf_token").toString();
     }
 
     if (response.cookies.length > 0) {
@@ -124,10 +131,25 @@ Future<Map<dynamic, dynamic>> exeFetch(
     }
 
     final stringData = await response.transform(utf8.decoder).join();
-    print('uri=$uri => Response status: ${response.statusCode}\nResponse body2: $stringData');
+    print(
+        'uri=$uri => Response status: ${response.statusCode}\nResponse body2: $stringData');
 
-    return jsonDecode(stringData);
-
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return Future<Map>.value(jsonDecode(stringData));
+    } else if (response.statusCode == 401) {
+      // throw Exception(Map.from({
+      //   "body":stringData,
+      //   "navigate":navigateTo()
+      // }));
+      return Future.error(
+          Map.from({"body": stringData, "navigate": navigateTo()}));
+    } else {
+      return Future.error(Map.from({
+        "err": response.statusCode,
+        "body": stringData,
+        "navigate": navigateTo()
+      }));
+    }
   } catch (e, stacktrace) {
     print(e);
     print(stacktrace);
