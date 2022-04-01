@@ -7,7 +7,6 @@ import 'package:flutter_crud_auth/services/secure_store.dart';
 import 'package:flutter_crud_auth/services/temp_store.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
-
 // Future<Map<dynamic, dynamic>> exeFetch(
 //     {required String uri,
 //     method = "get",
@@ -55,14 +54,16 @@ import 'package:device_info_plus/device_info_plus.dart';
 //   }
 // }
 
-Future<Map<dynamic, dynamic>> exeFetch(
-    {required String uri,
-    method = "get",
-    body = null,
-    Map<String, dynamic> header = const {
-      "Content-Type": "application/json",
-    },
-    navigateToOnError = null}) async {
+Future<Map<dynamic, dynamic>> exeFetch({
+  required String uri,
+  method = "get",
+  body = null,
+  Map<String, dynamic> header = const {
+    "Content-Type": "application/json",
+  },
+  navigateToOnError = null,
+  getRequest = null,
+}) async {
   if (navigateToOnError == null) {
     navigateToOnError = () {};
   }
@@ -97,8 +98,8 @@ Future<Map<dynamic, dynamic>> exeFetch(
       request.headers.add(key, value);
     });
 
-    String ua=request.headers.value("user-agent") ?? "";
-    ua=ua+","+jsonEncode(temp_store["deviceInfo"]);
+    String ua = request.headers.value("user-agent") ?? "";
+    ua = ua + "," + jsonEncode(temp_store["deviceInfo"]);
     request.headers..set("user-agent", ua);
 
     String cookies =
@@ -117,6 +118,10 @@ Future<Map<dynamic, dynamic>> exeFetch(
 
     if (body != null) {
       request.write(body);
+    }
+
+    if (getRequest != null) {
+      getRequest(request);
     }
 
     // print("request.headers ${request.headers}");
@@ -142,6 +147,7 @@ Future<Map<dynamic, dynamic>> exeFetch(
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return Future<Map>.value({"body": stringData});
     } else if (response.statusCode == 401) {
+      // // this also works
       // throw Exception(Map.from({
       //   "body":stringData,
       //   "navigate":navigateToOnError()
@@ -160,7 +166,8 @@ Future<Map<dynamic, dynamic>> exeFetch(
     print(e);
     print("stacktrace:");
     print(stacktrace);
-    return Future.error(Map.from({"body": {}, "navigate": navigateToOnError()}));
+    return Future.error(
+        Map.from({"body": {}, "navigate": navigateToOnError()}));
   } finally {
     client.close();
   }
