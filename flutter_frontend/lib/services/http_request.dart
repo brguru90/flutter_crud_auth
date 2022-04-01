@@ -5,6 +5,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:flutter_crud_auth/services/secure_store.dart';
 import 'package:flutter_crud_auth/services/temp_store.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+
 
 // Future<Map<dynamic, dynamic>> exeFetch(
 //     {required String uri,
@@ -60,9 +62,9 @@ Future<Map<dynamic, dynamic>> exeFetch(
     Map<String, dynamic> header = const {
       "Content-Type": "application/json",
     },
-    navigateTo = null}) async {
-  if (navigateTo == null) {
-    navigateTo = () {};
+    navigateToOnError = null}) async {
+  if (navigateToOnError == null) {
+    navigateToOnError = () {};
   }
 
   if (uri.startsWith("/")) {
@@ -95,6 +97,10 @@ Future<Map<dynamic, dynamic>> exeFetch(
       request.headers.add(key, value);
     });
 
+    String ua=request.headers.value("user-agent") ?? "";
+    ua=ua+","+jsonEncode(temp_store["deviceInfo"]);
+    request.headers..set("user-agent", ua);
+
     String cookies =
         temp_store["cookies"] ?? await storage.read(key: "cookies") ?? "";
     if (cookies != "") {
@@ -113,7 +119,7 @@ Future<Map<dynamic, dynamic>> exeFetch(
       request.write(body);
     }
 
-    print("request.headers ${request.headers}");
+    // print("request.headers ${request.headers}");
     HttpClientResponse response = await request.close();
 
     // ------------ reading response --------------------
@@ -131,29 +137,30 @@ Future<Map<dynamic, dynamic>> exeFetch(
     }
 
     final stringData = await response.transform(utf8.decoder).join();
-    print(
-        'uri=$uri => Response status: ${response.statusCode}\nResponse body2: $stringData');
+    // print('uri=$uri => Response status: ${response.statusCode}\nResponse body2: $stringData');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return Future<Map>.value(jsonDecode(stringData));
+      return Future<Map>.value({"body": stringData});
     } else if (response.statusCode == 401) {
       // throw Exception(Map.from({
       //   "body":stringData,
-      //   "navigate":navigateTo()
+      //   "navigate":navigateToOnError()
       // }));
       return Future.error(
-          Map.from({"body": stringData, "navigate": navigateTo()}));
+          Map.from({"body": stringData, "navigate": navigateToOnError()}));
     } else {
       return Future.error(Map.from({
         "err": response.statusCode,
         "body": stringData,
-        "navigate": navigateTo()
+        "navigate": navigateToOnError()
       }));
     }
   } catch (e, stacktrace) {
+    print("Exception:");
     print(e);
+    print("stacktrace:");
     print(stacktrace);
-    return {};
+    return Future.error(Map.from({"body": {}, "navigate": navigateToOnError()}));
   } finally {
     client.close();
   }

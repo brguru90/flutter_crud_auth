@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_crud_auth/services/http_request.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoginScreen extends StatefulWidget {
   final Map<String, String> env_values;
@@ -14,30 +15,61 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController emailController =
       new TextEditingController(text: "");
 
+  bool isLoading = true;
+
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    emailController.dispose();
     super.dispose();
+    WidgetsBinding.instance!.removeObserver(this);
+    emailController.dispose();
+    print("--------dispose");
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
     checkExistingSession();
+    print("--------initState");
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("-----didChangeAppLifecycleState");
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("--------resumed");
+        checkExistingSession();
+        break;
+      case AppLifecycleState.paused:
+        print("--------paused");
+        break;
+      default:
+        break;
+    }
   }
 
   void checkExistingSession() {
+    setState(() {
+      isLoading = true;
+    });
     exeFetch(
       uri: "/api/login_status/",
     )
-    .then((value) =>Navigator.pushReplacementNamed( context, "/user_profile"));
+        .then(
+            (value) => Navigator.pushReplacementNamed(context, "/user_profile"))
+        .catchError((e) {
+      setState(() {
+        isLoading = false;
+      });
+    });
   }
 
   void Login() async {
@@ -51,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
       )
           .then((value) =>
               // Navigator.pushReplacementNamed(context, "/user_profile"))
-               Navigator.pushNamed(context, "/user_profile"))
+              Navigator.pushNamed(context, "/user_profile"))
           .catchError((e) => Fluttertoast.showToast(
               msg: e.toString(),
               toastLength: Toast.LENGTH_SHORT,
@@ -67,6 +99,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+          backgroundColor: Colors.blue[900],
+          body: Center(
+              child: SpinKitCircle(
+            color: Colors.white,
+            size: 50.0,
+          )));
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Row(

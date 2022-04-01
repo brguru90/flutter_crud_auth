@@ -173,6 +173,11 @@ func LoginStatus(c *gin.Context) (AccessToken, string, int, bool) {
 		return AccessToken{}, "unAuthorized", http.StatusForbidden, false
 	}
 
+
+	if time.Now().UnixMilli()>token_claims.AccessToken.Exp{
+		return AccessToken{}, "tokenExpired", http.StatusForbidden, false
+	}
+
 	_, r_err := database.REDIS_DB_CONNECTION.Get(context.Background(), token_claims.AccessToken.Token_id).Result()
 	if r_err == nil {
 		return token_claims.AccessToken, "Session blocked", http.StatusForbidden, false

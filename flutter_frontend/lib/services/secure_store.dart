@@ -5,5 +5,5 @@ var storage = null;
 void initSecureStore() async {
   storage = new FlutterSecureStorage();
 
-  print("${await storage.readAll()}");
+  // print("${await storage.readAll()}");
 }
