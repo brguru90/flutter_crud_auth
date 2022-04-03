@@ -21,6 +21,8 @@ class _UserProfileState extends State<UserProfile> {
   int currentTab = 0;
   late Timer timerIntervalToCheckLoginStatus;
 
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   void checkExistingSession() {
     // if (pendingRequests["login_status"] != null) {
     //   try {
@@ -78,6 +80,7 @@ class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -138,9 +141,12 @@ class _UserProfileState extends State<UserProfile> {
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
                 ),
-                onPressed: () => setState(() {
-                      currentTab = 0;
-                    }),
+                onPressed: () {
+                  setState(() {
+                    currentTab = 0;
+                  });
+                  _scaffoldKey.currentState!.openEndDrawer();
+                },
                 child: ListTile(
                   leading: Icon(Icons.account_circle),
                   title: Text(
@@ -154,9 +160,12 @@ class _UserProfileState extends State<UserProfile> {
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
                 ),
-                onPressed: () => setState(() {
-                      currentTab = 1;
-                    }),
+                onPressed: () {
+                  setState(() {
+                    currentTab = 1;
+                  });
+                  _scaffoldKey.currentState!.openEndDrawer();
+                },
                 child: ListTile(
                   leading: Icon(Icons.list_alt),
                   title: Text(
@@ -170,15 +179,32 @@ class _UserProfileState extends State<UserProfile> {
                 style: TextButton.styleFrom(
                   alignment: Alignment.centerLeft,
                 ),
-                onPressed: () => setState(() {
-                      currentTab = 2;
-                    }),
+                onPressed: () {
+                  setState(() {
+                    currentTab = 2;
+                  });
+                  _scaffoldKey.currentState!.openEndDrawer();
+                },
                 child: ListTile(
                   leading: Icon(Icons.settings),
                   title: Text(
                     "Settings",
                     style: TextStyle(
                       color: currentTab == 2 ? Colors.blue[800] : Colors.black,
+                    ),
+                  ),
+                )),
+            TextButton(
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                ),
+                onPressed: logout,
+                child: const ListTile(
+                  leading: Icon(Icons.logout_outlined),
+                  title: Text(
+                    "Logout",
+                    style: TextStyle(
+                      color: Colors.black,
                     ),
                   ),
                 )),
