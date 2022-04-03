@@ -185,12 +185,35 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                               ),
                               onPressed: () =>
                                   Navigator.pushNamed(context, '/sign_up'),
-                              child: Text(
+                              child: const Text(
                                 "Click here",
                                 // style: TextStyle(height: 0.1),
                               )),
                         ),
                         Text(" to sign up"),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 40.0,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 20,
+                          child: TextButton(
+                              style: TextButton.styleFrom(
+                                // fixedSize: Size.fromHeight(1),
+                                minimumSize: Size(0, 1),
+                                padding: EdgeInsets.zero,
+                              ),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/user_profile'),
+                              child: const Text(
+                                "Try unauthorized access",
+                                // style: TextStyle(height: 0.1),
+                              )),
+                        ),
                       ],
                     )
                   ],

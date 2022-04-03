@@ -68,6 +68,8 @@ Future<Map<dynamic, dynamic>> exeFetch({
     navigateToIfNotAllowed = () {};
   }
 
+  Future<Map<dynamic, dynamic>> future;
+
   if (uri.startsWith("/")) {
     uri = uri.substring(1);
   }
@@ -145,17 +147,17 @@ Future<Map<dynamic, dynamic>> exeFetch({
     // print('uri=$uri => Response status: ${response.statusCode}\nResponse body2: $stringData');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return Future<Map>.value({"body": stringData});
+      future = Future<Map>.value({"body": stringData});
     } else if (response.statusCode == 401) {
       // // this also works
       // throw Exception(Map.from({
       //   "body":stringData,
       //   "navigate":navigateToIfNotAllowed()
       // }));
-      return Future.error(
+      future = Future.error(
           Map.from({"body": stringData, "navigate": navigateToIfNotAllowed()}));
     } else {
-      return Future.error(Map.from({
+      future = Future.error(Map.from({
         "err": response.statusCode,
         "body": stringData,
         "navigate": navigateToIfNotAllowed()
@@ -164,17 +166,20 @@ Future<Map<dynamic, dynamic>> exeFetch({
   } on HttpException catch (e, stacktrace) {
     print(e);
     if (e.message.contains("Request has been aborted")) {
-      return Future<Map>.value({"body": null});
+      future = Future<Map>.value({"body": null});
+    } else {
+      future = Future.error(
+          Map.from({"body": "{}", "navigate": navigateToIfNotAllowed()}));
     }
-    rethrow;
   } catch (e, stacktrace) {
     print("Exception:");
     print(e);
     print("stacktrace:");
     print(stacktrace);
-    return Future.error(
-        Map.from({"body": {}, "navigate": navigateToIfNotAllowed()}));
+    future = Future.error(
+        Map.from({"body": " {}", "navigate": navigateToIfNotAllowed()}));
   } finally {
     client.close();
   }
+  return future;
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter_crud_auth/services/http_request.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_crud_auth/sharedComponents/toastMessages/toastMessage.dart';
 
 class SignUP extends StatefulWidget {
   final Map<String, String> env_values;
@@ -42,8 +42,11 @@ class _SignUPState extends State<SignUP> {
           "name": nameController.text,
           "description": descriptionController.text,
         }),
-      ).then((value) => Navigator.pushNamedAndRemoveUntil(
-          context, "/user_profile", (Route<dynamic> route) => false));
+      )
+          .then((value) => Navigator.pushNamedAndRemoveUntil(
+              context, "/user_profile", (Route<dynamic> route) => false))
+          .catchError((e) =>
+              ToastMessage.error(jsonDecode(e["body"])["msg"] ?? e.toString()));
     } else {
       print("not ok");
     }
