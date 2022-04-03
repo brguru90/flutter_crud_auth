@@ -48,7 +48,7 @@ class _UserProfileDataState extends State<UserProfileData> {
         navigateToIfNotAllowed: () =>
             Navigator.pushReplacementNamed(context, "/")).then((data) {
       ToastMessage.success(jsonDecode(data["body"])["msg"] ?? data.toString());
-      // getProfileData();
+      getProfileData();
     }).catchError((e) =>
         // ignore: invalid_return_type_for_catch_error
         ToastMessage.error(jsonDecode(e["body"])["msg"] ?? e.toString()));

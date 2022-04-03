@@ -14,7 +14,7 @@ class UserActiveSessions extends StatefulWidget {
 class _UserActiveSessionsState extends State<UserActiveSessions> {
   List activeSessions = [];
 
-  void getActiveSessions() {
+  void getActiveSessions() async {
     exeFetch(
         uri: "/api/user/active_sessions/",
         navigateToIfNotAllowed: () =>
@@ -58,7 +58,7 @@ class _UserActiveSessionsState extends State<UserActiveSessions> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                    // Text(jsonEncode(activeSessions))
+                    // Text(jsonEncode(activeSessions)),
                     ...activeSessions.map((v) => activeSessionCard(
                           activeSession: v,
                           getActiveSessions: getActiveSessions,

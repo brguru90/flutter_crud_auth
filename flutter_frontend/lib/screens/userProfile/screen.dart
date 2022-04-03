@@ -3,9 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_crud_auth/services/http_request.dart';
-import 'package:flutter_crud_auth/sharedComponents/toastMessages/toastMessage.dart';
 import './userProfileData/screen.dart';
 import './userActiveSessions/screen.dart';
+import './userSettings/screen.dart';
 
 class UserProfile extends StatefulWidget {
   final Map<String, String> env_values;
@@ -82,59 +82,106 @@ class _UserProfileState extends State<UserProfile> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
+            DrawerHeader(
+              decoration: const BoxDecoration(
                 color: Colors.blue,
               ),
-              child: Text(
-                'Drawer Header',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Text("Email:",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          )),
+                      SizedBox(
+                        width: 20.0,
+                      ),
+                      Text(
+                        profileData["email"] ?? "loading...",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10.0,
+                  ),
+                  Row(
+                    children: [
+                      Text("UUID:",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          )),
+                      SizedBox(
+                        width: 20.0,
+                      ),
+                      Expanded(
+                        child: Text(
+                          profileData["uuid"] ?? "loading...",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            ListTile(
-              leading: Icon(Icons.account_circle),
-              title: TextButton(
-                  style: TextButton.styleFrom(
-                    primary: currentTab == 0 ? Colors.blue[800] : Colors.black,
-                    alignment: Alignment.centerLeft,
-                    enableFeedback: false,
-                    // fixedSize: Size.fromHeight(1),
-                    minimumSize: Size(0, 1),
-                    padding: EdgeInsets.zero,
-                  ),
-                  onPressed: () => setState(() {
-                        currentTab = 0;
-                      }),
-                  child: const Text(
+            TextButton(
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                ),
+                onPressed: () => setState(() {
+                      currentTab = 0;
+                    }),
+                child: ListTile(
+                  leading: Icon(Icons.account_circle),
+                  title: Text(
                     "Profile",
-                    // style: TextStyle(height: 0.1),
-                  )),
-            ),
-            ListTile(
-              leading: Icon(Icons.list_alt),
-              title: TextButton(
-                  style: TextButton.styleFrom(
-                    primary: currentTab == 1 ? Colors.blue[800] : Colors.black,
-                    alignment: Alignment.centerLeft,
-                    // fixedSize: Size.fromHeight(1),
-                    minimumSize: Size(0, 1),
-                    padding: EdgeInsets.zero,
+                    style: TextStyle(
+                      color: currentTab == 0 ? Colors.blue[800] : Colors.black,
+                    ),
                   ),
-                  onPressed: () => setState(() {
-                        currentTab = 1;
-                      }),
-                  child: const Text(
+                )),
+            TextButton(
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                ),
+                onPressed: () => setState(() {
+                      currentTab = 1;
+                    }),
+                child: ListTile(
+                  leading: Icon(Icons.list_alt),
+                  title: Text(
                     "Active sessions",
-                    // style: TextStyle(height: 0.1),
-                  )),
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-            ),
+                    style: TextStyle(
+                      color: currentTab == 1 ? Colors.blue[800] : Colors.black,
+                    ),
+                  ),
+                )),
+            TextButton(
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                ),
+                onPressed: () => setState(() {
+                      currentTab = 2;
+                    }),
+                child: ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text(
+                    "Settings",
+                    style: TextStyle(
+                      color: currentTab == 2 ? Colors.blue[800] : Colors.black,
+                    ),
+                  ),
+                )),
           ],
         ),
       ),
@@ -167,9 +214,11 @@ class _UserProfileState extends State<UserProfile> {
               case 0:
                 return UserProfileData(getUserData: getUserData);
               case 1:
-                return UserActiveSessions();
+                return const UserActiveSessions();
+              case 2:
+                return const UserSettings();
               default:
-                return UserProfileData(getUserData: getUserData);
+                return const Text("Todo");
             }
           })()),
     );
