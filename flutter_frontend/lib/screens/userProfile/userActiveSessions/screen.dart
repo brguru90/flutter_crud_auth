@@ -16,12 +16,17 @@ class _UserActiveSessionsState extends State<UserActiveSessions> {
 
   void getActiveSessions() {
     exeFetch(
-        uri: "/api/user/",
+        uri: "/api/user/active_sessions/",
         navigateToIfNotAllowed: () =>
             Navigator.pushReplacementNamed(context, "/")).then((data) {
       print(data);
       setState(() {
-        activeSessions = jsonDecode(data["body"])["data"];
+        activeSessions = [...jsonDecode(data["body"])["data"]];
+        activeSessions.sort((a, b) => b["id"].compareTo(a["id"]));
+        activeSessions = [
+          ...activeSessions.where((e) => e["status"] == "active"),
+          ...activeSessions.where((e) => e["status"] != "active"),
+        ];
       });
     });
   }
@@ -50,10 +55,16 @@ class _UserActiveSessionsState extends State<UserActiveSessions> {
               const SizedBox(
                 height: 20.0,
               ),
-              Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [activeSessionCard()])
+              Container(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    // Text(jsonEncode(activeSessions))
+                    ...activeSessions.map((v) => activeSessionCard(
+                          activeSession: v,
+                          getActiveSessions: getActiveSessions,
+                        )),
+                  ])),
             ]));
   }
 }
