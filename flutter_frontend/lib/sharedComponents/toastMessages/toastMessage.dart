@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 class ToastMessage {
   static void FlutterToastTemplate(
       {required msg, fg_color = Colors.white, bg_color = Colors.deepOrange}) {
+    Fluttertoast.cancel();
     Fluttertoast.showToast(
         msg: msg,
         toastLength: Toast.LENGTH_SHORT,

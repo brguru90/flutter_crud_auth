@@ -125,7 +125,7 @@ class activeSessionCard extends StatelessWidget {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10.0, vertical: 7.0)),
-                      onPressed: () => activeSession["status"] == "active"
+                      onPressed: () async => activeSession["status"] == "active"
                           ? blockSession(
                               token_id: activeSession["token_id"],
                               exp: activeSession["exp"])
