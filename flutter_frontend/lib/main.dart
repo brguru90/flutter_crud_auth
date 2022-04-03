@@ -11,7 +11,8 @@ import 'package:flutter_crud_auth/screens/signUp/screen.dart';
 import 'package:flutter_crud_auth/screens/userProfile/screen.dart';
 
 Future<void> loadENV() {
-  if (String.fromEnvironment("RELEASE_MODE") == "true") {
+  const RELEASE_MODE = String.fromEnvironment("RELEASE_MODE");
+  if (RELEASE_MODE == "true") {
     return dotenv.load(fileName: "assets/env/.env_prod");
   } else {
     return dotenv.load(fileName: "assets/env/.env");
