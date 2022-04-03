@@ -19,7 +19,6 @@ class _UserActiveSessionsState extends State<UserActiveSessions> {
         uri: "/api/user/active_sessions/",
         navigateToIfNotAllowed: () =>
             Navigator.pushReplacementNamed(context, "/")).then((data) {
-      print(data);
       setState(() {
         activeSessions = [...jsonDecode(data["body"])["data"]];
         activeSessions.sort((a, b) => b["id"].compareTo(a["id"]));

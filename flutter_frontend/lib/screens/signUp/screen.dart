@@ -42,7 +42,8 @@ class _SignUPState extends State<SignUP> {
           "name": nameController.text,
           "description": descriptionController.text,
         }),
-      ).then((value) =>  Navigator.pushNamed(context, "/user_profile"));
+      ).then((value) => Navigator.pushNamedAndRemoveUntil(
+          context, "/user_profile", (Route<dynamic> route) => false));
     } else {
       print("not ok");
     }

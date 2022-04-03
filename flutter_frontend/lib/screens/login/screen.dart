@@ -82,7 +82,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       )
           .then((value) =>
               // Navigator.pushReplacementNamed(context, "/user_profile"))
-              Navigator.pushNamed(context, "/user_profile"))
+              Navigator.pushNamedAndRemoveUntil(
+                  context, "/user_profile", (Route<dynamic> route) => false))
           .catchError((e) =>
               ToastMessage.error(jsonDecode(e["body"])["msg"] ?? e.toString()));
     } else {

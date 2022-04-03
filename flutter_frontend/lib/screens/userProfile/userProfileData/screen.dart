@@ -4,7 +4,8 @@ import 'package:flutter_crud_auth/services/http_request.dart';
 import 'package:flutter_crud_auth/sharedComponents/toastMessages/toastMessage.dart';
 
 class UserProfileData extends StatefulWidget {
-  const UserProfileData({Key? key}) : super(key: key);
+  Future Function() getUserData;
+  UserProfileData({Key? key, required this.getUserData}) : super(key: key);
 
   @override
   State<UserProfileData> createState() => _UserProfileDataState();
@@ -19,23 +20,19 @@ class _UserProfileDataState extends State<UserProfileData> {
   final TextEditingController descriptionController =
       TextEditingController(text: "");
 
-  void getUserData() {
-    exeFetch(
-        uri: "/api/user/",
-        navigateToIfNotAllowed: () =>
-            Navigator.pushReplacementNamed(context, "/")).then((data) {
-      Map tempData = jsonDecode(data["body"])["data"];
+  void getProfileData() {
+    widget.getUserData().then((data) {
       emailController
-        ..text = tempData["email"]
-        ..selection = TextSelection.collapsed(offset: tempData["email"].length);
+        ..text = data["email"]
+        ..selection = TextSelection.collapsed(offset: data["email"].length);
       nameController
-        ..text = tempData["name"]
-        ..selection = TextSelection.collapsed(offset: tempData["name"].length);
+        ..text = data["name"]
+        ..selection = TextSelection.collapsed(offset: data["name"].length);
       descriptionController
-        ..text = tempData["description"]
+        ..text = data["description"]
         ..selection =
-            TextSelection.collapsed(offset: tempData["description"].length);
-      uuidController.text = tempData["uuid"];
+            TextSelection.collapsed(offset: data["description"].length);
+      uuidController.text = data["uuid"];
     });
   }
 
@@ -51,7 +48,7 @@ class _UserProfileDataState extends State<UserProfileData> {
         navigateToIfNotAllowed: () =>
             Navigator.pushReplacementNamed(context, "/")).then((data) {
       ToastMessage.success(jsonDecode(data["body"])["msg"] ?? data.toString());
-      // getUserData();
+      // getProfileData();
     }).catchError((e) =>
         // ignore: invalid_return_type_for_catch_error
         ToastMessage.error(jsonDecode(e["body"])["msg"] ?? e.toString()));
@@ -60,7 +57,7 @@ class _UserProfileDataState extends State<UserProfileData> {
   @override
   void initState() {
     super.initState();
-    getUserData();
+    getProfileData();
   }
 
   @override
