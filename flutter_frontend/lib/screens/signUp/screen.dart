@@ -34,7 +34,7 @@ class _SignUPState extends State<SignUP> {
 
   void signUp() async {
     if (_formKey.currentState!.validate()) {
-      await exeFetch(
+      exeFetch(
         uri: "/api/sign_up/",
         method: "post",
         body: jsonEncode({
@@ -42,7 +42,7 @@ class _SignUPState extends State<SignUP> {
           "name": nameController.text,
           "description": descriptionController.text,
         }),
-      );
+      ).then((value) =>  Navigator.pushNamed(context, "/user_profile"));
     } else {
       print("not ok");
     }
