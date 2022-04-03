@@ -61,11 +61,11 @@ Future<Map<dynamic, dynamic>> exeFetch({
   Map<String, dynamic> header = const {
     "Content-Type": "application/json",
   },
-  navigateToOnError = null,
+  navigateToIfNotAllowed = null,
   getRequest = null,
 }) async {
-  if (navigateToOnError == null) {
-    navigateToOnError = () {};
+  if (navigateToIfNotAllowed == null) {
+    navigateToIfNotAllowed = () {};
   }
 
   if (uri.startsWith("/")) {
@@ -150,24 +150,30 @@ Future<Map<dynamic, dynamic>> exeFetch({
       // // this also works
       // throw Exception(Map.from({
       //   "body":stringData,
-      //   "navigate":navigateToOnError()
+      //   "navigate":navigateToIfNotAllowed()
       // }));
       return Future.error(
-          Map.from({"body": stringData, "navigate": navigateToOnError()}));
+          Map.from({"body": stringData, "navigate": navigateToIfNotAllowed()}));
     } else {
       return Future.error(Map.from({
         "err": response.statusCode,
         "body": stringData,
-        "navigate": navigateToOnError()
+        "navigate": navigateToIfNotAllowed()
       }));
     }
+  } on HttpException catch (e, stacktrace) {
+    print(e);
+    if (e.message.contains("Request has been aborted")) {
+      return Future<Map>.value({"body": null});
+    }
+    rethrow;
   } catch (e, stacktrace) {
     print("Exception:");
     print(e);
     print("stacktrace:");
     print(stacktrace);
     return Future.error(
-        Map.from({"body": {}, "navigate": navigateToOnError()}));
+        Map.from({"body": {}, "navigate": navigateToIfNotAllowed()}));
   } finally {
     client.close();
   }

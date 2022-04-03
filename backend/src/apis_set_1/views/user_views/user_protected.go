@@ -95,12 +95,12 @@ func GetUserData(c *gin.Context) {
 			}
 
 			if _page > 0 {
-				total_users,_:=database.REDIS_DB_CONNECTION.Get(context.Background(),"users_count").Result()
-				total_users_int,_:=strconv.ParseInt(total_users,10,64)
+				total_users, _ := database.REDIS_DB_CONNECTION.Get(context.Background(), "users_count").Result()
+				total_users_int, _ := strconv.ParseInt(total_users, 10, 64)
 				my_modules.CreateAndSendResponse(c, http.StatusOK, "success", "Record found", map[string]interface{}{
-					"users":    rowSlice,
-					"cur_page": _page,
-					"total_users":total_users_int,
+					"users":       rowSlice,
+					"cur_page":    _page,
+					"total_users": total_users_int,
 				})
 				return
 			} else {
@@ -291,7 +291,6 @@ func Logout(c *gin.Context) {
 	my_modules.CreateAndSendResponse(c, http.StatusOK, "success", "Logged out", nil)
 }
 
-
 func updateActiveSession(activeSessionsRow my_modules.ActiveSessionsRow, status string) (int64, error) {
 	db_connection := database.POSTGRES_DB_CONNECTION
 
@@ -311,7 +310,6 @@ func updateActiveSession(activeSessionsRow my_modules.ActiveSessionsRow, status 
 	rows_updated := res.RowsAffected()
 	return rows_updated, nil
 }
-
 
 // @BasePath /api
 // @Summary block specified session
@@ -338,8 +336,8 @@ func BlockSession(c *gin.Context) {
 		my_modules.CreateAndSendResponse(c, http.StatusBadRequest, "error", "Invalid input data format", nil)
 		return
 	}
-	
-	// overide any existing uuid with uuid of current user 
+
+	// overide any existing uuid with uuid of current user
 	activeSessionsRow.Column_user_uuid = payload.Data.UUID
 
 	rows_updated, err := updateActiveSession(activeSessionsRow, "blocked")

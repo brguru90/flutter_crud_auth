@@ -14,7 +14,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-
 // @BasePath /api
 // @Summary url to signup
 // @Schemes
@@ -31,7 +30,7 @@ import (
 func SignUp(c *gin.Context) {
 	db_connection := database.POSTGRES_DB_CONNECTION
 	// in Progress
-	
+
 	var newUserRow my_modules.NewUserRow
 	// ShouldBindJSON will validate json body & convert it to structure object
 	if err := c.ShouldBindJSON(&newUserRow); err != nil {
@@ -132,11 +131,10 @@ func Login(c *gin.Context) {
 	my_modules.CreateAndSendResponse(c, http.StatusOK, "success", "Authorization success", newUserRow)
 }
 
-
 // @BasePath /api
-// @Summary 
+// @Summary
 // @Schemes
-// @Description api used to validate user login session 
+// @Description api used to validate user login session
 // @Tags Login status
 // @Accept json
 // @Produce json

@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_crud_auth/services/http_request.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_crud_auth/sharedComponents/toastMessages/toastMessage.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -84,14 +83,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           .then((value) =>
               // Navigator.pushReplacementNamed(context, "/user_profile"))
               Navigator.pushNamed(context, "/user_profile"))
-          .catchError((e) => Fluttertoast.showToast(
-              msg: e.toString(),
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0));
+          .catchError((e) =>
+              ToastMessage.error(jsonDecode(e["body"])["msg"] ?? e.toString()));
     } else {
       print("not ok");
     }
