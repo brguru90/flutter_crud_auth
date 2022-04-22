@@ -6,6 +6,8 @@ import 'package:flutter_crud_auth/services/http_request.dart';
 import './userProfileData/screen.dart';
 import './userActiveSessions/screen.dart';
 import './userSettings/screen.dart';
+import 'package:flutter_crud_auth/services/temp_store.dart';
+import 'package:flutter_crud_auth/services/secure_store.dart';
 
 class UserProfile extends StatefulWidget {
   final Map<String, String> env_values;
@@ -51,12 +53,10 @@ class _UserProfileState extends State<UserProfile> {
     return c.future;
   }
 
-  void logout() {
-    exeFetch(
-      uri: "/api/user/logout/",
-    )
-        .then((value) => Navigator.pushReplacementNamed(context, "/"))
-        .catchError((e) => print(e));
+  void logout() async {
+    temp_store["cookies"] = null;
+    await storage.delete(key: "cookies");
+    Navigator.pushReplacementNamed(context, "/");
   }
 
   @override

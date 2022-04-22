@@ -136,7 +136,7 @@ func Authenticate(c *gin.Context, newUserRow NewUserRow) AccessToken {
 	return access_token_payload.AccessToken
 }
 
-func LoginStatus(c *gin.Context) (AccessToken, string, int, bool) {
+func LoginStatus(c *gin.Context,enforce_csrf_check bool) (AccessToken, string, int, bool) {
 	var token_claims AccessTokenClaims
 	access_token, err := c.Cookie("access_token")
 
@@ -182,6 +182,27 @@ func LoginStatus(c *gin.Context) (AccessToken, string, int, bool) {
 	if r_err == nil {
 		return token_claims.AccessToken, "Session blocked", http.StatusForbidden, false
 	}
+
+	csrf_token := c.Request.Header.Get("csrf_token")
+	if csrf_token == "" {
+		token_claims.AccessToken = Authenticate(c, NewUserRow{
+			Column_email: token_claims.AccessToken.Data.Email,
+			Column_uuid:  token_claims.AccessToken.Data.UUID,
+		})
+		if enforce_csrf_check{
+			return AccessToken{}, "missing csrf token", http.StatusForbidden, false
+		}
+	} else {
+		if token_claims.AccessToken.Csrf_token != csrf_token {
+			token_claims.AccessToken = Authenticate(c, NewUserRow{
+				Column_email: token_claims.AccessToken.Data.Email,
+				Column_uuid:  token_claims.AccessToken.Data.UUID,
+			})
+			if enforce_csrf_check{
+				return AccessToken{}, "invalid csrf token", http.StatusForbidden, false
+			}
+		}
+	}	
 	return token_claims.AccessToken, "", http.StatusOK, true
 }
 
