@@ -54,9 +54,13 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void logout() async {
-    temp_store["cookies"] = null;
-    await storage.delete(key: "cookies");
-    Navigator.pushReplacementNamed(context, "/");
+    exeFetch(
+      uri: "/api/user/logout/",
+    ).then((value) async {
+      temp_store["cookies"] = null;
+      await storage.delete(key: "cookies");
+      Navigator.pushReplacementNamed(context, "/");
+    }).catchError((e) => print(e));
   }
 
   @override

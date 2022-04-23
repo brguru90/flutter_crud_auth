@@ -131,7 +131,8 @@ Future<Map<dynamic, dynamic>> exeFetch({
 
     // ------------ reading response --------------------
 
-    if (response.headers.value("csrf_token") != null) {
+    if (response.headers.value("csrf_token") != null &&
+        response.headers.value("csrf_token") != "") {
       temp_store["csrf_token"] =
           response.headers.value("csrf_token").toString();
     }
